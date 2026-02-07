@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Be My Valentine? 💝</title>
+  <style>
+    :root{
+      --bg:#fff5f8; --card:#ffffff; --primary:#e91e63; --primary-dark:#ad1457;
+      --accent:#ff7aa2; --text:#2d2a2e; --muted:#7a747a;
+      --ok:#2e7d32; --warn:#ef6c00;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh; display:grid; place-items:center; background:
+      radial-gradient(1200px 800px at 10% 0%, #ffe3ec 0%, transparent 60%),
+      radial-gradient(1000px 700px at 100% 100%, #ffeaf1 0%, transparent 55%),
+      var(--bg);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+    }
+    .card{
+      width:min(92vw, 860px); background:var(--card); border-radius:22px; position:relative;
+      padding:28px 22px 28px; box-shadow: 0 12px 42px rgba(233,30,99,.16); overflow:hidden;
+    }
+    .hearts-bg{ position:absolute; inset:0; pointer-events:none; opacity:.15;
+      background:
+        radial-gradient(circle at 20% 20%, #e91e63 2px, transparent 3px),
+        radial-gradient(circle at 80% 30%, #e91e63 2px, transparent 3px),
+        radial-gradient(circle at 60% 80%, #e91e63 2px, transparent 3px);
+      background-size:50px 50px; animation:float 12s linear infinite;
+    }
+    @keyframes float { 0%{transform:translateY(0)} 50%{transform:translateY(-8px)} 100%{transform:translateY(0)} }
+
+    h1{ margin:6px 0 8px; font-size: clamp(26px, 4.5vw, 36px); color:var(--primary) }
+    p.tagline{margin:0 0 18px; font-size:clamp(14px,2.8vw,18px); color:#5a555a}
+    .question{ font-size: clamp(20px,3.8vw,28px); margin: 18px auto 26px; font-weight:700; text-align:center; }
+
+    .btn-row{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; position:relative }
+    button{ border:none; border-radius:999px; padding:14px 22px; font-size:18px; font-weight:700; cursor:pointer;
+      transition: transform 180ms ease, background-color 200ms ease, box-shadow 200ms ease; will-change:transform; }
+    #yesBtn{ background:linear-gradient(180deg, var(--primary), var(--primary-dark)); color:#fff; box-shadow:0 8px 18px rgba(233,30,99,.35) }
+    #yesBtn:hover{ transform: translateY(-2px) scale(1.04) } #yesBtn:active{ transform: translateY(0) scale(.98) }
+    #noBtn{ background:#f2f2f6; color:#333; box-shadow:0 6px 14px rgba(0,0,0,.08); position:absolute; }
+    #noBtn:hover{ transform: translateY(-1px) } #noBtn:active{ transform: translateY(0) }
+
+    .hint{ margin-top:12px; font-size:13px; color:var(--muted); text-align:center }
+    .hidden{ display:none !important }
+
+    /* Views */
+    .view{ display:none } .view.active{ display:block }
+    .section-title{ font-size:clamp(20px,3.4vw,28px); color:var(--primary-dark); margin:6px 0 16px; text-align:center }
+
+    /* Gift grid */
+    .grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:16px; }
+    @media (max-width:820px){ .grid{ grid-template-columns:1fr } }
+    .gift{
+      border:2px dashed #ffd1e0; border-radius:18px; padding:18px; text-align:center; background:#fffafc;
+      transition:transform .15s ease, box-shadow .15s ease; cursor:pointer;
+    }
+    .gift:hover{ transform:translateY(-3px); box-shadow:0 10px 20px rgba(233,30,99,.12) }
+    .gift h3{ margin:8px 0 6px; font-size:20px; color:#c2185b }
+    .gift p{ margin:0; color:#6b676b; font-size:14px }
+    .gift-emoji{ font-size:40px; }
+
+    /* Quiz */
+    .quiz{ max-width:720px; margin:0 auto }
+    .q{ margin:14px 0 16px; padding:14px; border-radius:14px; background:#fff7fb; border:1px solid #ffe1ee }
+    .q h4{ margin:0 0 10px; font-size:18px }
+    .options{ display:grid; gap:8px }
+    .opt{ display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:12px; border:1px solid #f4d5e3; background:#fff }
+    .result{ margin-top:14px; font-weight:700; }
+    .ok{ color:var(--ok) } .warn{ color:var(--warn) }
+
+    /* Letter */
+    .letter-wrap{ max-width:760px; margin:0 auto }
+    .letter{
+      background:#fff; border:1px solid #ffe1ee; border-radius:16px; padding:18px; line-height:1.55;
+      font-size:17px; color:#3a353b; position:relative;
+    }
+    .letter::before{
+      content:""; position:absolute; inset:0; border-radius:16px; pointer-events:none;
+      background: repeating-linear-gradient(135deg, rgba(233,30,99,.06) 0 6px, transparent 6px 14px);
+      mask: radial-gradient(48px 48px at -20px -20px, #000 98%, transparent 102%) subtract,
+            radial-gradient(56px 56px at calc(100% + 20px) calc(100% + 20px), #000 98%, transparent 102%);
+      -webkit-mask: radial-gradient(48px 48px at -20px -20px, #000 98%, transparent 102%) subtract,
+                     radial-gradient(56px 56px at calc(100% + 20px) calc(100% + 20px), #000 98%, transparent 102%);
+      opacity:.25;
+    }
+    .letter-actions{ display:flex; gap:10px; margin-top:12px; flex-wrap:wrap }
+    .pill{ padding:10px 16px; border-radius:999px; font-weight:700; cursor:pointer; border:none }
+    .primary{ background:linear-gradient(180deg, var(--primary), var(--primary-dark)); color:#fff }
+    .secondary{ background:#f2f2f6 }
+
+    /* Photo display */
+    .uploader{ max-width:760px; margin:0 auto }
+    .frame{
+      border:2px dashed #ffc7dc; border-radius:16px; padding:12px; background:#fff7fb; text-align:center;
+    }
+    .preview{
+      position:relative; display:inline-block; margin-top:10px; border-radius:14px; overflow:hidden;
+      box-shadow:0 8px 20px rgba(0,0,0,.08);
+    }
+    .preview img{ max-width:min(82vw,700px); height:auto; display:block }
+    .heart-overlay{
+      position:absolute; inset:0; pointer-events:none; background:
+        radial-gradient(circle at 20% 15%, rgba(233,30,99,.12) 0 90px, transparent 94px),
+        radial-gradient(circle at 80% 85%, rgba(255,122,162,.12) 0 110px, transparent 114px);
+    }
+
+    /* Nav */
+    .nav{ display:flex; gap:10px; margin:10px 0 4px; justify-content:center; flex-wrap:wrap }
+    .link{ padding:10px 16px; border-radius:999px; border:1px solid #ffd1e0; background:#fff; cursor:pointer; }
+    .link:hover{ background:#fff1f6 }
+    .back{ background:#fff1f6; border-color:#ffc1d8; }
+
+    /* Confetti canvas */
+    canvas#confetti{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none }
+  </style>
+</head>
+<body>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="title" aria-describedby="question">
+    <div class="hearts-bg" aria-hidden="true"></div>
+    <canvas id="confetti" class="hidden"></canvas>
+
+    <!-- ====== VIEW 1: Ask to be Valentine ====== -->
+    <section id="view-intro" class="view active" aria-live="polite">
+      <h1 id="title">Hey ❤️</h1>
+      <p class="tagline">I’ve got a tiny question with a huge amount of love in it…</p>
+      <div id="question" class="question">Will you be my Valentine?</div>
+
+      <!-- Button row is the positioning container for runaway No -->
+      <div class="btn-row" id="btnRow">
+        <button id="yesBtn" aria-label="Yes, be your Valentine">Yes</button>
+        <button id="noBtn" aria-label="No">No</button>
+      </div>
+
+      <div id="hint" class="hint">(You can totally say yes… just saying 😄)</div>
+    </section>
+
+    <!-- ====== VIEW 2: Gifts Menu ====== -->
+    <section id="view-gifts" class="view" aria-live="polite">
+      <h2 class="section-title">Yay! Pick your gift, my Valentine 💝</h2>
+      <div class="nav">
+        <button class="link" data-go="quiz">🎁 Quiz</button>
+        <button class="link" data-go="letter">💌 Letter</button>
+        <button class="link" data-go="photo">📷 Photo</button>
+      </div>
+      <div class="grid" role="list">
+        <article class="gift" role="listitem" data-go="quiz">
+          <div class="gift-emoji" aria-hidden="true">🎁</div>
+          <h3>Gift 1: Quiz</h3>
+          <p>Two fun questions—one at a time!</p>
+        </article>
+        <article class="gift" role="listitem" data-go="letter">
+          <div class="gift-emoji" aria-hidden="true">💌</div>
+          <h3>Gift 2: Letter</h3>
+          <p>A little love letter straight from my heart.</p>
+        </article>
+        <article class="gift" role="listitem" data-go="photo">
+          <div class="gift-emoji" aria-hidden="true">📷</div>
+          <h3>Gift 3: Photo</h3>
+          <p>Just a cute picture, framed with hearts.</p>
+        </article>
+      </div>
+      <div class="nav" style="margin-top:16px">
+        <button class="link back" data-go="intro">⬅️ Back</button>
+      </div>
+    </section>
+
+    <!-- ====== VIEW 3: Quiz (one-by-one) ====== -->
+    <section id="view-quiz" class="view" aria-live="polite">
+      <h2 class="section-title">🎁 Gift 1 — Cute Couple Quiz</h2>
+      <div class="quiz">
+        <div id="quizProgress" class="hint" style="text-align:center;margin-bottom:8px;">Question 1 of 2</div>
+        <div class="q" id="quizStep">
+          <h4 id="quizQuestion"></h4>
+          <div id="quizOptions" class="options"></div>
+        </div>
+        <div class="btn-row">
+          <button id="backStep" class="secondary pill">Back</button>
+          <button id="nextStep" class="primary pill">Next</button>
+          <button id="submitQuiz" class="primary pill hidden">Submit</button>
+          <button id="restartQuiz" class="secondary pill hidden">Restart</button>
+        </div>
+        <div id="quizResult" class="result" aria-live="polite"></div>
+      </div>
+      <div class="nav">
+        <button class="link back" data-go="gifts">⬅️ Back to Gifts</button>
+      </div>
+    </section>
+
+    <!-- ====== VIEW 4: Letter ====== -->
+    <section id="view-letter" class="view" aria-live="polite">
+      <h2 class="section-title">💌 Gift 2 — A Letter For You</h2>
+      <div class="letter-wrap">
+        <div id="letter" class="letter">
+          <p>My dearest <span id="gfNameInLetter">Jyoti</span>,</p>
+          <p>
+            Every day with you feels like a little piece of magic I get to carry around.
+            You’re my happiest thought, my softest place, and the reason ordinary moments feel special.
+            When I look ahead, the only plan that makes sense is simple:
+            a lifetime of smiles, inside jokes, and hand-in-hand adventures—with you.
+          </p>
+          <p>
+            Thank you for being you: kind, silly, stubborn in the cutest ways, and absolutely irreplaceable.
+            If love is a promise, consider this my forever one.
+          </p>
+          <p>Yours always,<br/><strong><span id="bfNameInLetter">Suraj</span></strong></p>
+        </div>
+        <div class="letter-actions">
+          <button id="copyLetter" class="pill secondary">Copy Letter</button>
+          <button id="printLetter" class="pill primary">Print / Save as PDF</button>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="link back" data-go="gifts">⬅️ Back to Gifts</button>
+      </div>
+    </section>
+
+    <!-- ====== VIEW 5: Photo (display only) ====== -->
+    <section id="view-photo" class="view" aria-live="polite">
+      <h2 class="section-title">📷 Gift 3 — A Photo For You</h2>
+      <div class="uploader">
+        <div class="frame">
+          <div id="display" class="preview" aria-live="polite">
+            <!-- Replace 'your-photo.jpg' with your file (keep it next to this HTML).
+                 If not found, it falls back to a placeholder automatically. -->
+            <img id="displayImg"
+                 alt="Us ❤️"
+                 src="your-photo.jpg"
+                 onerror="this.onerror=null; this.src='https://picsum.photos/seed/valentine/700/450';"/>
+            <div class="heart-overlay" aria-hidden="true"></div>
+          </div>
+          <p class="hint">Tip: Replace the <code>src</code> above with your own file (e.g., <b>us.png</b>) placed next to this HTML file.</p>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="link back" data-go="gifts">⬅️ Back to Gifts</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // -------- Personalization (edit names here) --------
+    const gfName = "Jyoti";
+    const bfName = "Suraj";
+
+    // -------- Base elements --------
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn  = document.getElementById('noBtn');
+    const canvas = document.getElementById('confetti');
+    const btnRow = document.getElementById('btnRow');
+
+    // Views
+    const views = {
+      intro: document.getElementById('view-intro'),
+      gifts: document.getElementById('view-gifts'),
+      quiz:  document.getElementById('view-quiz'),
+      letter:document.getElementById('view-letter'),
+      photo: document.getElementById('view-photo'),
+    };
+
+    // Inject names
+    document.getElementById('title').textContent = `Hey ${gfName} ❤️`;
+    document.getElementById('gfNameInLetter').textContent = gfName;
+    document.getElementById('bfNameInLetter').textContent = bfName;
+
+    // -------- Intro: No enlarges Yes on click --------
+    let growthCount = 0;
+    const MAX_GROWTH_STEPS = 6;
+    const GROWTH_PER_STEP = 0.15;
+
+    function updateYesSize(){
+      const scale = 1 + Math.min(growthCount, MAX_GROWTH_STEPS) * GROWTH_PER_STEP;
+      yesBtn.style.transform = `scale(${scale})`;
+    }
+
+    noBtn.addEventListener('click', () => {
+      // If she actually clicks No, keep the original playful behavior
+      growthCount++;
+      updateYesSize();
+      noBtn.textContent = 'Please say Yes!';
+      noBtn.animate(
+        [{ transform:'translateX(0)' }, { transform:'translateX(-6px)' }, { transform:'translateX(6px)' }, { transform:'translateX(0)' }],
+        { duration:260, easing:'ease-in-out' }
+      );
+    });
+
+    // -------- Runaway "No" on hover / focus / touch --------
+    function placeNoInitially() {
+      const rowRect = btnRow.getBoundingClientRect();
+      const yesRect = yesBtn.getBoundingClientRect();
+      const noRect  = noBtn.getBoundingClientRect();
+      const left = (rowRect.width / 2) + (yesRect.width / 2) + 10 - (noRect.width / 2);
+      const top  = 0;
+      Object.assign(noBtn.style, {
+        left: `${Math.max(10, Math.min(rowRect.width - noRect.width - 10, left))}px`,
+        top:  `${Math.max(0, top)}px`
+      });
+    }
+
+    function moveNoButtonAway(ev){
+      const rowRect = btnRow.getBoundingClientRect();
+      const noRect  = noBtn.getBoundingClientRect();
+      const pad = 8;
+      const maxLeft = rowRect.width - noRect.width - pad;
+      const maxTop  = Math.max(0, rowRect.height - noRect.height - pad);
+
+      let newLeft = pad + Math.random() * Math.max(1, maxLeft - pad);
+      let newTop  = Math.random() * Math.max(1, maxTop);
+
+      if (ev) {
+        const cx = (ev.touches?.[0]?.clientX ?? ev.clientX) - rowRect.left;
+        const cy = (ev.touches?.[0]?.clientY ?? ev.clientY) - rowRect.top;
+        const centerX = noRect.left - rowRect.left + noRect.width/2;
+        const centerY = noRect.top  - rowRect.top  + noRect.height/2;
+        const dx = centerX - cx;
+        const dy = centerY - cy;
+        const dist = Math.hypot(dx, dy) || 1;
+        const push = 80;
+        newLeft = Math.min(maxLeft, Math.max(pad, newLeft + (dx/dist)*push));
+        newTop  = Math.min(maxTop,  Math.max(0,   newTop  + (dy/dist)*push));
+      }
+
+      noBtn.animate(
+        [{ transform:'translateY(0)' }, { transform:'translateY(-6px)' }, { transform:'translateY(0)' }],
+        { duration:200, easing:'ease-out' }
+      );
+      noBtn.style.left = `${newLeft}px`;
+      noBtn.style.top  = `${newTop}px`;
+    }
+
+    window.addEventListener('load', placeNoInitially);
+    window.addEventListener('resize', placeNoInitially);
+    noBtn.addEventListener('mouseenter', moveNoButtonAway);
+    noBtn.addEventListener('focus', moveNoButtonAway);
+    noBtn.addEventListener('touchstart', (e)=>{
+      moveNoButtonAway(e);
+      e.preventDefault();
+    }, { passive:false });
+
+    // -------- Navigation helpers --------
+    function showView(name){
+      Object.entries(views).forEach(([k,el])=>{
+        el.classList.toggle('active', k===name);
+      });
+      document.querySelector('.card').scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.querySelectorAll('[data-go]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const go = el.getAttribute('data-go');
+        if(go==='intro') showView('intro');
+        else if(go==='gifts') showView('gifts');
+        else if(go==='quiz') { renderQuiz(); showView('quiz'); }
+        else if(go==='letter') showView('letter');
+        else if(go==='photo') showView('photo');
+      });
+    });
+
+    // -------- Yes shows gifts + confetti --------
+    yesBtn.addEventListener('click', () => {
+      launchConfetti(4000);
+      setTimeout(()=> showView('gifts'), 700);
+    });
+
+    // -------- QUIZ: one-by-one steps --------
+    // Q1: Where do I plan to spend the rest of my life? (A correct)
+    // Q2: Who is the boss in this relationship? (C correct: Both option A and B)
+    const quizSteps = [
+      {
+        id: 'q1',
+        q: 'Where do I plan to spend the rest of my life?',
+        options: [['A','Your heart'], ['B','Paris'], ['C','Mars']],
+        correct: 'A'
+      },
+      {
+        id: 'q2',
+        q: 'Who is the boss in this relationship?',
+        options: [['A','Jyoti'], ['B','Not Suraj'], ['C','Both option A and B']],
+        correct: 'C'
+      }
+    ];
+
+    let currentStep = 0;
+    const answers = {};
+    const quizProgress = document.getElementById('quizProgress');
+    const quizQuestion = document.getElementById('quizQuestion');
+    const quizOptions  = document.getElementById('quizOptions');
+    const btnBack   = document.getElementById('backStep');
+    const btnNext   = document.getElementById('nextStep');
+    const btnSubmit = document.getElementById('submitQuiz');
+    const btnRestart= document.getElementById('restartQuiz');
+    const quizResult= document.getElementById('quizResult');
+
+    function renderQuiz(){
+      const step = quizSteps[currentStep];
+      quizProgress.textContent = `Question ${currentStep+1} of ${quizSteps.length}`;
+      quizQuestion.textContent = step.q;
+      quizOptions.innerHTML = '';
+
+      step.options.forEach(([key,text])=>{
+        const id = `${step.id}_${key}`;
+        const label = document.createElement('label');
+        label.className = 'opt';
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = step.id;
+        input.value = key;
+        input.id = id;
+        if(answers[step.id] === key) input.checked = true;
+        const span = document.createElement('span');
+        span.innerHTML = `${key}) ${text}`;
+        label.appendChild(input);
+        label.appendChild(span);
+        quizOptions.appendChild(label);
+        input.addEventListener('change', updateNavState);
+      });
+
+      btnBack.disabled = currentStep === 0;
+      btnNext.classList.toggle('hidden', currentStep === quizSteps.length-1);
+      btnSubmit.classList.toggle('hidden', currentStep !== quizSteps.length-1);
+      btnRestart.classList.add('hidden');
+      quizResult.textContent = '';
+      updateNavState();
+    }
+
+    function updateNavState(){
+      const step = quizSteps[currentStep];
+      const selected = document.querySelector(`input[name="${step.id}"]:checked`);
+      btnNext.disabled   = (currentStep < quizSteps.length-1) && !selected;
+      btnSubmit.disabled = (currentStep === quizSteps.length-1) && !selected;
+    }
+
+    btnNext.addEventListener('click', ()=>{
+      const step = quizSteps[currentStep];
+      const selected = document.querySelector(`input[name="${step.id}"]:checked`);
+      if(selected) answers[step.id] = selected.value;
+      currentStep = Math.min(currentStep+1, quizSteps.length-1);
+      renderQuiz();
+    });
+
+    btnBack.addEventListener('click', ()=>{
+      const step = quizSteps[currentStep];
+      const selected = document.querySelector(`input[name="${step.id}"]:checked`);
+      if(selected) answers[step.id] = selected.value;
+      currentStep = Math.max(currentStep-1, 0);
+      renderQuiz();
+    });
+
+    btnSubmit.addEventListener('click', ()=>{
+      const step = quizSteps[currentStep];
+      const selected = document.querySelector(`input[name="${step.id}"]:checked`);
+      if(selected) answers[step.id] = selected.value;
+
+      const allAnswered = quizSteps.every(s => answers[s.id]);
+      if(!allAnswered){
+        quizResult.innerHTML = '<span class="warn">Please answer both questions 😄</span>';
+        return;
+      }
+      const allCorrect = quizSteps.every(s => answers[s.id] === s.correct);
+      if(allCorrect){
+        quizResult.innerHTML = '<span class="ok">Perfect score! 💚 We\'re made for each other.</span>';
+        launchConfetti(2500);
+      }else{
+        quizResult.innerHTML = '<span class="warn">Close! Think with your heart and try again 💖</span>';
+      }
+      btnRestart.classList.remove('hidden');
+    });
+
+    btnRestart.addEventListener('click', ()=>{
+      Object.keys(answers).forEach(k => delete answers[k]);
+      currentStep = 0;
+      renderQuiz();
+    });
+
+    // Render once so it's ready when entering the view
+    renderQuiz();
+
+    // -------- Letter actions --------
+    document.getElementById('copyLetter').addEventListener('click', async ()=>{
+      const text = document.getElementById('letter').innerText;
+      try{
+        await navigator.clipboard.writeText(text);
+        toast('Letter copied to clipboard! 📋');
+      }catch{
+        toast('Could not copy—try pressing Ctrl/Cmd + C.', true);
+      }
+    });
+    document.getElementById('printLetter').addEventListener('click', ()=>{
+      window.print();
+    });
+
+    // -------- Confetti --------
+    function launchConfetti(durationMs=3000){
+      canvas.classList.remove('hidden');
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+
+      function resize(){
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+      }
+      resize();
+      const onResize = ()=> resize();
+      window.addEventListener('resize', onResize, { passive:true });
+
+      const colors = ['#e91e63','#ff9ec4','#ffb703','#4dd0e1','#a7ff83','#ffd1e8'];
+      const pieces = Array.from({ length: 180 }, () => ({
+        x: Math.random() * canvas.clientWidth,
+        y: -10 - Math.random() * canvas.clientHeight * 0.5,
+        r: 4 + Math.random() * 6,
+        c: colors[Math.floor(Math.random() * colors.length)],
+        vy: 1.2 + Math.random() * 2.2,
+        vx: -1 + Math.random() * 2,
+        rot: Math.random() * Math.PI,
+        vr: -0.1 + Math.random() * 0.2
+      }));
+
+      let stop = false;
+      function tick(){
+        if(stop) return;
+        ctx.clearRect(0,0,canvas.clientWidth, canvas.clientHeight);
+        pieces.forEach(p=>{
+          p.vy += 0.01;
+          p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+          if(p.y > canvas.clientHeight + 10){
+            p.y = -10; p.x = Math.random() * canvas.clientWidth; p.vy = 1.2 + Math.random() * 2.2;
+          }
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.c;
+          ctx.fillRect(-p.r, -p.r/2, p.r*2, p.r);
+          ctx.restore();
+        });
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+
+      setTimeout(()=>{
+        stop = true;
+        canvas.classList.add('hidden');
+        ctx.clearRect(0,0,canvas.clientWidth, canvas.clientHeight);
+        window.removeEventListener('resize', onResize);
+      }, durationMs);
+    }
+
+    // -------- Tiny toast helper --------
+    function toast(msg, warn=false){
+      const t = document.createElement('div');
+      t.textContent = msg;
+      Object.assign(t.style, {
+        position:'fixed', left:'50%', bottom:'22px', transform:'translateX(-50%)',
+        background boxShadow:'0 6px 16px rgba(0,0,0,.12)', zIndex:9999, fontWeight:'600'
+      });
+      document.body.appendChild(t);
+      setTimeout(()=> t.remove(), 1800);
+    }
+
+    // Start at Intro view explicitly
+    showView('intro');
+  </script>
+</body>
+</html>
