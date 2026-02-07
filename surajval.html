@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -508,3 +509,61 @@
       const onResize = ()=> resize();
       window.addEventListener('resize', onResize, { passive:true });
 
+      const colors = ['#e91e63','#ff9ec4','#ffb703','#4dd0e1','#a7ff83','#ffd1e8'];
+      const pieces = Array.from({ length: 180 }, () => ({
+        x: Math.random() * canvas.clientWidth,
+        y: -10 - Math.random() * canvas.clientHeight * 0.5,
+        r: 4 + Math.random() * 6,
+        c: colors[Math.floor(Math.random() * colors.length)],
+        vy: 1.2 + Math.random() * 2.2,
+        vx: -1 + Math.random() * 2,
+        rot: Math.random() * Math.PI,
+        vr: -0.1 + Math.random() * 0.2
+      }));
+
+      let stop = false;
+      function tick(){
+        if(stop) return;
+        ctx.clearRect(0,0,canvas.clientWidth, canvas.clientHeight);
+        pieces.forEach(p=>{
+          p.vy += 0.01;
+          p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+          if(p.y > canvas.clientHeight + 10){
+            p.y = -10; p.x = Math.random() * canvas.clientWidth; p.vy = 1.2 + Math.random() * 2.2;
+          }
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.c;
+          ctx.fillRect(-p.r, -p.r/2, p.r*2, p.r);
+          ctx.restore();
+        });
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+
+      setTimeout(()=>{
+        stop = true;
+        canvas.classList.add('hidden');
+        ctx.clearRect(0,0,canvas.clientWidth, canvas.clientHeight);
+        window.removeEventListener('resize', onResize);
+      }, durationMs);
+    }
+
+    // -------- Tiny toast helper --------
+    function toast(msg, warn=false){
+      const t = document.createElement('div');
+      t.textContent = msg;
+      Object.assign(t.style, {
+        position:'fixed', left:'50%', bottom:'22px', transform:'translateX(-50%)',
+        background boxShadow:'0 6px 16px rgba(0,0,0,.12)', zIndex:9999, fontWeight:'600'
+      });
+      document.body.appendChild(t);
+      setTimeout(()=> t.remove(), 1800);
+    }
+
+    // Start at Intro view explicitly
+    showView('intro');
+  </script>
+</body>
+</html>
