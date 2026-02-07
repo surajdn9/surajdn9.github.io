@@ -261,20 +261,28 @@
 
       <form id="quizForm">
         <div class="q">
-          <div class="q-title">1) Who is the boss in this relationship?</div>
+          <div class="q-title">1) Who is the boss in this relationship for lifetime?</div>
           <div class="choices">
             <label class="choice"><input type="radio" name="q1" value="A" /> A) Jyoti</label>
             <label class="choice"><input type="radio" name="q1" value="B" /> B) Not Suraj</label>
             <label class="choice"><input type="radio" name="q1" value="C" /> C) Both option A and B</label>
           </div>
         </div>
+        <div class="q">
+          <div class="q-title">2) Will you change the SYSTEM password of the hana database :P ?</div>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="q2" value="A" /> A) Instead you will get kick on the dhungan</label>
+            <label class="choice"><input type="radio" name="q2" value="B" /> B) Chappal on dhungan</label>
+            <label class="choice"><input type="radio" name="q2" value="C" /> C) Both A and B </label>
+          </div>
+        </div>
 
         <div class="q">
-          <div class="q-title">2) Where do I plan to spend the rest of my life?</div>
+          <div class="q-title">3) Where do you plan to spend the rest of my life?</div>
           <div class="choices">
-            <label class="choice"><input type="radio" name="q2" value="A" /> A) Your heart</label>
-            <label class="choice"><input type="radio" name="q2" value="B" /> B) Paris</label>
-            <label class="choice"><input type="radio" name="q2" value="C" /> C) Mars</label>
+            <label class="choice"><input type="radio" name="q3" value="A" /> A) My heart</label>
+            <label class="choice"><input type="radio" name="q3" value="B" /> B) Paris</label>
+            <label class="choice"><input type="radio" name="q3" value="C" /> C) Mars</label>
           </div>
         </div>
 
@@ -294,9 +302,9 @@
       <div class="letter">
         <p>Dear Jyoti,</p>
         <p>
-          From the moment you walked into my world, everything’s been brighter, funnier,
-          softer(hmm may be not :P), and just a little bit more magical. I want to spend my days making
-          you smile, my evenings keeping you close, and my life loving you with all I’ve got.
+         From the moment you walked into my life, everything became brighter, funnier, and honestly—softer (well… maybe not always softer 😜), but definitely a whole lot more magical.
+It’s really hard being away from you this Valentine’s Day, but I promise you I’ll be there with you soon.
+I want to spend my days making you smile, my mornings holding you close with a cup of chai, and my whole life loving you with everything I have.
         </p>
         <p>
           So today, and always — will you be my Valentine?
@@ -422,9 +430,10 @@
     e.preventDefault();
     const data = new FormData(quizForm);
     const q1 = data.get('q1'); // correct: C
-    const q2 = data.get('q2'); // correct: A
+    const q2 = data.get('q2'); // correct: C
+    const q3 = data.get('q3'); // correct: A
 
-    const correct = (q1 === 'C') && (q2 === 'A');
+    const correct = (q1 === 'C') && (q2 === 'C') && (q3 === 'A');
 
     if (correct) {
       quizError.style.display = 'none';
